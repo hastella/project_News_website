@@ -5,54 +5,56 @@ menu.forEach((menu) =>
 )
 
 let searchBtn = document.querySelector(".searchBar button")
+let url // 지역변수로 쓰이면 getNews에서 호출하는 url이 호출되지 않기 때문에 전역변수로 우선 선언해준다.
+
+const getNews = async() => {
+    try {
+        let header = new Headers({
+            'x-api-key':'TvKjDF1l8DZ3zLPQDeU7LxuSCqeh2N5mJIWEumwA178'
+        })
+
+        let response = await fetch(url,{headers:header})  // ajax, http, fetch 방법이 있다.
+        let data = await response.json()
+        if(response.status == 200){
+            if(data.total_hits == 0){
+                throw new Error("검색된 결과값이 없습니다. 검색값을 확인해 주십시오.")
+            }
+            news = data.articles
+            console.log(news)
+            render()
+        }else{
+            throw new Error(data.message)
+        }
+    } catch (error) {
+        console.log("잡힌 에러는", error.message)
+        errorRender(error.message)
+    }
+}
 
 const getLatestNews = async() => {  // await을 쓸때는 async가 항상 같이 있어야한다
-    let url = new URL(
+    url = new URL(
         `https://api.newscatcherapi.com/v2/latest_headlines?countries=KR&topic=sport&page_size=10`
     )
     //단순히 let url = '' 이 아닌 new URL('')을 써준다면 콘솔에서 호출시에 URL에 관한 정보를 준다.
-    let header = new Headers({
-        'x-api-key':'TvKjDF1l8DZ3zLPQDeU7LxuSCqeh2N5mJIWEumwA178'
-    })
-    let response = await fetch(url,{headers:header})  // ajax, http, fetch 방법이 있다.
-    let data = await response.json()
-    news = data.articles
-    console.log(news)
-    
-    render()
+    getNews()
 }
 
 const getNewsByTopic = async (event) => {     //addEventListener가 주는 모든 event에 관한 정보를 함수에 담아서 전달해준다.
    // console.log("worked!",event.target.textContent)     // textContent는 해당 태그안의 내용만 호출해준다.
     let topic = event.target.textContent.toLowerCase()
-    let url = new URL(
+    url = new URL(
         `https://api.newscatcherapi.com/v2/latest_headlines?countries=KR&page_size=10&topic=${topic}`
     )
-    let header = new Headers({
-        'x-api-key':'TvKjDF1l8DZ3zLPQDeU7LxuSCqeh2N5mJIWEumwA178'
-    })
-    let response = await fetch(url,{headers:header})  // ajax, http, fetch 방법이 있다.
-    let data = await response.json()
-    news = data.articles
-    console.log(news)
+    getNews()
 
-    render()
 }
 
 const getNewsByKeyword = async() => {
     let keyword = document.querySelector("input").value //input값 받기
-    let url = new URL(
+    url = new URL(
         `https://api.newscatcherapi.com/v2/search?page_size=10&q=${keyword}`
     )
-    let header = new Headers({
-        'x-api-key':'TvKjDF1l8DZ3zLPQDeU7LxuSCqeh2N5mJIWEumwA178'
-    })
-    let response = await fetch(url,{headers:header})  // ajax, http, fetch 방법이 있다.
-    let data = await response.json()
-    news = data.articles
-    console.log(news)
-
-    render()
+    getNews()
 }
 
 const render = () => {
@@ -84,6 +86,13 @@ const render = () => {
     }).join('')
 
     document.getElementById("news-board").innerHTML = newsHTML
+} 
+
+const errorRender = (message) => {
+    let errorHTML = `<div class="alert alert-danger text-center" role="alert">
+    ${message}
+  </div>`
+    document.getElementById("news-board").innerHTML = errorHTML
 }
 
 function openMenu() {
