@@ -1,4 +1,7 @@
 let latestNews = []
+let page = 1
+let totalPage = 0
+
 let menu = document.querySelectorAll(".menu button")
 menu.forEach((menu) => 
     menu.addEventListener("click", (event) => getNewsByTopic(event))
@@ -10,18 +13,21 @@ let url // 지역변수로 쓰이면 getNews에서 호출하는 url이 호출되
 const getNews = async() => {
     try {
         let header = new Headers({
-            'x-api-key':'TvKjDF1l8DZ3zLPQDeU7LxuSCqeh2N5mJIWEumwA178'
+            'x-api-key':'FrONHsW-_XbULyU-GbIss54VHbyoNzG1E69oTuz023E'
         })
-
         let response = await fetch(url,{headers:header})  // ajax, http, fetch 방법이 있다.
         let data = await response.json()
         if(response.status == 200){
             if(data.total_hits == 0){
                 throw new Error("검색된 결과값이 없습니다. 검색값을 확인해 주십시오.")
             }
+            console.log("받는 데이터가 뭐지?",data)
+            totalPage = data.total_pages
+            page = data.page
             news = data.articles
             console.log(news)
             render()
+            pagination()
         }else{
             throw new Error(data.message)
         }
@@ -93,6 +99,22 @@ const errorRender = (message) => {
     ${message}
   </div>`
     document.getElementById("news-board").innerHTML = errorHTML
+}
+
+const pagination = () => {
+    let paginationHTML = ``
+    // page group
+    let pageGroup = Math.ceil(page/5)
+    //last
+    let last = pageGroup*5
+    // first
+    let first = last - 4
+    // first ~ last 페이지 프린트
+    for(let i = first; i<=last; i++){
+        paginationHTML+= `<li class="page-item"><a class="page-link" href="#">${i}</a></li>`
+
+    }
+    document.querySelector(".pagination").innerHTML = paginationHTML
 }
 
 function openMenu() {
