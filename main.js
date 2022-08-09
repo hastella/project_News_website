@@ -15,6 +15,8 @@ const getNews = async() => {
         let header = new Headers({
             'x-api-key':'FrONHsW-_XbULyU-GbIss54VHbyoNzG1E69oTuz023E'
         })
+        url.searchParams.set('page', page) // page값의 parameter를 기존의 url에 추가해주는 방법
+        console.log(url)
         let response = await fetch(url,{headers:header})  // ajax, http, fetch 방법이 있다.
         let data = await response.json()
         if(response.status == 200){
@@ -110,11 +112,63 @@ const pagination = () => {
     // first
     let first = last - 4
     // first ~ last 페이지 프린트
-    for(let i = first; i<=last; i++){
-        paginationHTML+= `<li class="page-item"><a class="page-link" href="#">${i}</a></li>`
 
+    //과제
+        // total page가 3일경우 세개의 페이지만 프린트 하는법
+        // 내가 그룹1일때 << 버튼이 없다 & 마지막 그룹일때 >> 버튼이 없다
+
+    paginationHTML += `
+    <li class="page-item">
+      <a class="page-link ${
+        page==1 ? "noArrow" : "withArrow"   // 삼항연산자에 class 적용하는법 
+      }" href="#" aria-label="Previous" onclick="moveToPage(page=1)">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>`
+    
+    paginationHTML += `
+    <li class="page-item">
+        <a class="page-link ${
+            page==1 ? "noArrow" : "withArrow"
+          }" href="#" aria-label="Previous" onclick="moveToPage(${
+            page>1 ? page-1 : page
+        })">
+            <span aria-hidden="true">&lt;</span>
+        </a>
+    </li>`
+
+    for(let i = first; i<=last; i++){
+        paginationHTML+= `
+        <li class="page-item ${
+            page==i ? "active" : "" //삼항 연산식을 통한 active 조건 걸기
+        }"><a class="page-link" href="#" onclick="moveToPage(${i})">${i}</a>
+        </li>`
     }
+
+    paginationHTML+= `
+    <li class="page-item">
+        <a class="page-link" href="#" aria-label="Previous" onclick="moveToPage(${page+1})">
+            <span aria-hidden="true">&gt;</span>
+        </a>
+    </li>`
+
+    
+    paginationHTML += `
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Next" onclick="moveToPage(page=totalPage)">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>`
+
     document.querySelector(".pagination").innerHTML = paginationHTML
+}
+
+const moveToPage = (pageNum) => {
+    // 1. 이동하고 싶은 페이지를 알아야한다
+    page = pageNum
+
+    // 2. 이동하고 싶은 페이지를 가지고 api를 다시 호출
+    getNews()
 }
 
 function openMenu() {

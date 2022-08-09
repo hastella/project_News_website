@@ -77,6 +77,17 @@
     cursor: pointer;
 }
 
+.noArrow {
+    display: none;
+}
+
+.withArrow {
+    display: block;
+}
+
+ 
+
+
 /* .limitText{
     overflow: hidden;
     text-overflow: ellipsis;
