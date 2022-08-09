@@ -108,14 +108,17 @@ const pagination = () => {
     // page group
     let pageGroup = Math.ceil(page/5)
     //last
-    let last = pageGroup*5
-    // first
-    let first = last - 4
+    let last = pageGroup * 5
+        if (last > totalPage) {
+            // 마지막 그룹이 5개 이하이면
+            last = totalPage
+        }
+    let first = last - 4 <= 0 ? 1 : last-4 // 첫그룹이 5페이지 이하이면
     // first ~ last 페이지 프린트
 
     //과제
         // total page가 3일경우 세개의 페이지만 프린트 하는법
-        // 내가 그룹1일때 << 버튼이 없다 & 마지막 그룹일때 >> 버튼이 없다
+        // 마지막 그룹일때 >> 버튼이 없다
 
     paginationHTML += `
     <li class="page-item">
@@ -145,20 +148,22 @@ const pagination = () => {
         </li>`
     }
 
-    paginationHTML+= `
-    <li class="page-item">
-        <a class="page-link" href="#" aria-label="Previous" onclick="moveToPage(${page+1})">
-            <span aria-hidden="true">&gt;</span>
-        </a>
-    </li>`
+    if (last < totalPage) {
+        paginationHTML+= `
+        <li class="page-item">
+            <a class="page-link" href="#" aria-label="Previous" onclick="moveToPage(${page+1})">
+                <span aria-hidden="true">&gt;</span>
+            </a>
+        </li>`
 
+        paginationHTML += `
+        <li class="page-item">
+            <a class="page-link" href="#" aria-label="Next" onclick="moveToPage(totalPage)">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>`
+    }
     
-    paginationHTML += `
-    <li class="page-item">
-      <a class="page-link" href="#" aria-label="Next" onclick="moveToPage(page=totalPage)">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>`
 
     document.querySelector(".pagination").innerHTML = paginationHTML
 }
